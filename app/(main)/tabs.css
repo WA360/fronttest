@@ -1,0 +1,20 @@
+.draggable-tab {
+    padding: 8px;
+    margin-bottom: 4px;
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: move;
+}
+
+.tabs {
+    display: flex;
+}
+
+.tabs > div {
+    flex: 1;
+}
+
+.tab-panel {
+    height: 400px;
+}
