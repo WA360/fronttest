@@ -13,11 +13,10 @@ interface TabData {
   title: string;
 }
 
-// 목록 누르고 node서버에서 데이터 받아와서 처리했다 가정
 const graph_data = {
     "nodes": [
         {
-            "id": 1, // start_page
+            "id": 1,
             "level": 1
         },
         {
@@ -87,51 +86,43 @@ const Page = () => {
   const [pageNumber, setPageNumber] = useState<number | null>(1);
   const pdfFile = useRecoilValue(pdfFileState);
 
-  // tab 인터페이스 관련
-  const [tabs1, setTabs1] = useState<TabData[]>([{ key: 'diagram', title: 'Diagram' }, { key: 'a', title: 'Tab 1' }]);
-  const [activeTab1, setActiveTab1] = useState<string>('a');  // 활성화된 탭 상태
+  const [tabs1, setTabs1] = useState<TabData[]>([{ key: 'diagram', title: 'Diagram' }]);
+  const [activeTab1, setActiveTab1] = useState<number>(0);
 
-  const [tabs2, setTabs2] = useState<TabData[]>([{ key: 'chat', title: 'Chat' }, { key: 'a', title: 'Tab 1' }]);
-  const [activeTab2, setActiveTab2] = useState<string>('a');  // 활성화된 탭 상태
+  const [tabs2, setTabs2] = useState<TabData[]>([{ key: 'chat', title: 'Chat' }]);
+  const [activeTab2, setActiveTab2] = useState<number>(0);
 
   const addTab1 = () => {
     const newKey = `tab-${tabs1.length}`;
     setTabs1([...tabs1, { key: newKey, title: `Tab ${tabs1.length}` }]);
-    setActiveTab1(newKey);  // 새 탭을 활성화 상태로 설정
+    setActiveTab1(tabs1.length);  // 새 탭을 활성화 상태로 설정
   };
 
   const addTab2 = () => {
-    const newKey = `tab-${tabs2.length + 1}`;
+    const newKey = `tab-${tabs2.length}`;
     setTabs2([...tabs2, { key: newKey, title: `Tab ${tabs2.length}` }]);
-    setActiveTab2(newKey);  // 새 탭을 활성화 상태로 설정
+    setActiveTab2(tabs2.length);  // 새 탭을 활성화 상태로 설정
   };
 
   const removeTab1 = (key: string) => {
     const newTabs = tabs1.filter(tab => tab.key !== key);
+    const newIndex = tabs1.findIndex(tab => tab.key === key) === activeTab1 && activeTab1 > 0 ? activeTab1 - 1 : activeTab1;
     setTabs1(newTabs);
-    if (activeTab1 === key && newTabs.length > 0) {
-      setActiveTab1(newTabs[0].key);
-    } else if (newTabs.length === 0) {
-      setActiveTab1('');
-    }
+    setActiveTab1(newIndex);
   };
 
   const removeTab2 = (key: string) => {
     const newTabs = tabs2.filter(tab => tab.key !== key);
+    const newIndex = tabs2.findIndex(tab => tab.key === key) === activeTab2 && activeTab2 > 0 ? activeTab2 - 1 : activeTab2;
     setTabs2(newTabs);
-    if (activeTab2 === key && newTabs.length > 0) {
-      setActiveTab2(newTabs[0].key);
-    } else if (newTabs.length === 0) {
-      setActiveTab2('');
-    }
+    setActiveTab2(newIndex);
   };
 
   const handleNodeClick = (pageNumber: number) => {
-    // 새로운 탭을 추가하고 클릭한 노드 ID에 해당하는 페이지를 설정
     const newTabKey = `tab-${tabs1.length}`;
     setTabs1([...tabs1, { key: newTabKey, title: `Page ${pageNumber}` }]);
-    setActiveTab1(newTabKey);
-    setPageNumber(pageNumber); // 페이지 번호 업데이트
+    setActiveTab1(tabs1.length);
+    setPageNumber(pageNumber);
   };
 
   useEffect(() => {
@@ -140,16 +131,15 @@ const Page = () => {
 
   return (
     <div className="flex">
-      <Tabs selectedTabClassName="active-tab" onSelect={tabIndex => setActiveTab1(tabs1[tabIndex].key)} className="flex-1">
+      <Tabs selectedIndex={activeTab1} onSelect={(tabIndex) => setActiveTab1(tabIndex)} className="flex-1">
         <TabList>
-          {tabs1.map((tab,index) => (
+          {tabs1.map((tab, index) => (
             <Tab key={tab.key}>
               {tab.title}
               &nbsp;
-              {index != 0 && <button onClick={() => removeTab1(tab.key)}>x</button>}
+              {index !== 0 && <button onClick={() => removeTab1(tab.key)}>x</button>}
             </Tab>
           ))}
-          <button onClick={addTab1}>new tab</button>
         </TabList>
         {tabs1.map((tab) => (
           <TabPanel key={tab.key}>
@@ -165,16 +155,15 @@ const Page = () => {
         ))}
       </Tabs>
 
-      <Tabs selectedTabClassName="active-tab" onSelect={tabIndex => setActiveTab2(tabs2[tabIndex].key)} className="flex-1">
+      <Tabs selectedIndex={activeTab2} onSelect={(tabIndex) => setActiveTab2(tabIndex)} className="flex-1">
         <TabList>
           {tabs2.map((tab, index) => (
             <Tab key={tab.key}>
               {tab.title}
               &nbsp;
-              {index != 0 && <button onClick={() => removeTab2(tab.key)}>x</button>}
+              {index !== 0 && <button onClick={() => removeTab2(tab.key)}>x</button>}
             </Tab>
           ))}
-          <button onClick={addTab2}>new tab</button>
         </TabList>
         {tabs2.map((tab) => (
           <TabPanel key={tab.key}>
